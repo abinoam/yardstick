@@ -9,6 +9,7 @@ require 'yard/logging'
 
 require 'yardstick/ordered_set'
 require 'yardstick/measurement'
+require 'yardstick/decorator'
 
 require 'yardstick/config'
 require 'yardstick/report_output'
