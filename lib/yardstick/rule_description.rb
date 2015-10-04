@@ -1,9 +1,53 @@
 module Yardstick
-  module RuleDescription
+  class RuleDescription
+    def self.parse(description)
+      new(Tokenizer.new(description).tokenize)
+    end
+
+    def initialize(tokens)
+      @tokens = tokens
+    end
+
+    def ==(other)
+      tokens == other.tokens
+    end
+
+    protected
+
+    attr_reader :tokens
+
+    class Token
+      extend Forwardable
+
+      def self.coerce(value)
+        new(value[1..-2])
+      end
+
+      def initialize(value)
+        @value = value
+      end
+
+      def_delegator :value, :to_str
+      def_delegators :to_str, :==
+
+      private
+
+      attr_reader :value
+    end
+
+    Subject = Class.new(Token)
+    Option  = Class.new(Token)
+
+    class Text < Token
+      def self.coerce(value)
+        new(value)
+      end
+    end
+
     class Tokenizer
       PATTERNS = {
-        subject: /(\*[@\w ]+\*)/,
-        option:  /(_[\w ]+_)/
+        Subject => /(\*[@\w ]+\*)/,
+        Option  => /(_[\w ]+_)/
       }.freeze
 
       def initialize(text)
@@ -21,11 +65,11 @@ module Yardstick
       private
 
       def classify(token)
-        PATTERNS.each do |name, pattern|
-          return [[name, token]] if /\A#{pattern}\Z/.match(token)
+        PATTERNS.each do |klass, pattern|
+          return [klass.coerce(token)] if /\A#{pattern}\Z/.match(token)
         end
 
-        [[:text, token]]
+        [Text.coerce(token)]
       end
 
       def tokens

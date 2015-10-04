@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 module Yardstick
-  module RuleDescription
+  class RuleDescription
     describe Tokenizer, '#tokenize' do
       subject { instance.tokenize }
 
@@ -11,32 +11,32 @@ module Yardstick
 
       context 'when plain text' do
         let(:input)  { 'plain string'            }
-        let(:tokens) { [[:text, 'plain string']] }
+        let(:tokens) { [Text.new('plain string')] }
 
-        it { should eql(tokens) }
+        it { should eq(tokens) }
       end
 
       context "when input has text wrapped in '*'" do
         let(:input)  { '*special* message' }
-        let(:tokens) { [[:subject, '*special*'], [:text, ' message']] }
+        let(:tokens) { [Subject.new('special'), Text.new(' message')] }
 
-        it { should eql(tokens) }
+        it { should eq(tokens) }
       end
 
       context "when input has text wrapped in '_'" do
         let(:input)  { 'underlined _value_' }
-        let(:tokens) { [[:text, 'underlined '], [:option, '_value_']] }
+        let(:tokens) { [Text.new('underlined '), Option.new('value')] }
 
-        it { should eql(tokens) }
+        it { should eq(tokens) }
       end
 
       context "when input has both '*' and '_'" do
         let(:input)  { '*subject* and _value_' }
         let(:tokens) do
-          [[:subject, '*subject*'], [:text, ' and '], [:option, '_value_']]
+          [Subject.new('subject'), Text.new(' and '), Option.new('value')]
         end
 
-        it { should eql(tokens) }
+        it { should eq(tokens) }
       end
     end
   end
