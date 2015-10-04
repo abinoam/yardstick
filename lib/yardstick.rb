@@ -17,6 +17,7 @@ require 'yardstick/document'
 
 require 'yardstick/rule'
 require 'yardstick/rule_config'
+require 'yardstick/rule_description'
 require 'yardstick/rules/api_tag'
 require 'yardstick/rules/example_tag'
 require 'yardstick/rules/summary'
