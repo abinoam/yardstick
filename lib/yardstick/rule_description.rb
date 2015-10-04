@@ -1,28 +1,35 @@
 module Yardstick
   module RuleDescription
     class Tokenizer
-      SUBJECT_PATTERN = /(\*[@\w ]+\*)/
-      OPTION_PATTERN  = /(_[\w ]+_)/
+      PATTERNS = {
+        subject: /(\*[@\w ]+\*)/,
+        option:  /(_[\w ]+_)/
+      }.freeze
 
       def initialize(text)
         @text = text
       end
 
       def tokenize
-        text.split(pattern).reduce([]) do |tokens, part|
-          tokens + case part
-                   when ''              then []
-                   when SUBJECT_PATTERN then [[:subject, part]]
-                   when OPTION_PATTERN  then [[:option,  part]]
-                   else                      [[:text,    part]]
-                   end
+        tokens.reduce([]) do |tokens, part|
+          next tokens if part.empty?
+
+          tokens + classify(part)
         end
       end
 
       private
 
-      def pattern
-        Regexp.union(SUBJECT_PATTERN, OPTION_PATTERN)
+      def classify(token)
+        PATTERNS.each do |name, pattern|
+          return [[name, token]] if /\A#{pattern}\Z/.match(token)
+        end
+
+        [[:text, token]]
+      end
+
+      def tokens
+        text.split(Regexp.union(*PATTERNS.values))
       end
 
       attr_reader :text
